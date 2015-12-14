@@ -27,8 +27,14 @@ BEGIN
                                           p_dynamic_action => p_dynamic_action);
   END IF;
   --
-  -- add html2canvas js and screencapture js
-  apex_javascript.add_library(p_name           => 'html2canvas',
+  -- add html2canvas js and screencapture js and promise for older browsers
+  apex_javascript.add_library(p_name           => 'es6-promise.min',
+                              p_directory      => p_plugin.file_prefix,
+                              p_version        => NULL,
+                              p_skip_extension => FALSE);
+
+  --
+  apex_javascript.add_library(p_name           => 'html2canvas.min',
                               p_directory      => p_plugin.file_prefix,
                               p_version        => NULL,
                               p_skip_extension => FALSE);

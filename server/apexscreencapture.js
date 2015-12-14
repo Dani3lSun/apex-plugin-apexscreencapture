@@ -1,7 +1,11 @@
 function getImage(itemName,canvas,openWindow) {
   var img    = canvas.toDataURL("image/png");
   if (openWindow == 'Y') {
-    window.open(img, '_blank');
+    if (navigator.vendor.indexOf("Apple")==0 && /\sSafari\//.test(navigator.userAgent)) {
+      window.location.href = img;
+    } else {
+    window.open(img,'_blank');
+    }
   } else {
     apex.item(itemName).setValue(img);
   }
