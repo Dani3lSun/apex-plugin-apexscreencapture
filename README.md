@@ -30,6 +30,24 @@ The plugin settings are highly customizable and you can change:
 - As action choose "APEX Screen Capture".
 - Choose best fitting plugin attributes (help included)
 
+If you choose to save the screenshot (data uri base64 png) to an APEX item you can use a PL/SQL function like this to convert it to BLOB:
+
+```language-sql
+CREATE OR REPLACE FUNCTION png2blob(i_clob IN CLOB) RETURN BLOB IS
+  l_clob_base64 CLOB;
+  l_blob        BLOB;
+  --
+BEGIN
+  -- cut out the data uri string
+  l_clob_base64 := ltrim(i_clob,
+                         'data:image/png;base64,');
+  -- convert base64 to blob (mimetype: image/png)
+  l_blob := apex_web_service.clobbase642blob(p_clob => l_clob_base64);
+  --
+  RETURN l_blob;
+END png2blob;
+```
+
 ##Demo Application
 https://apex.oracle.com/pls/apex/f?p=57743:14
 
