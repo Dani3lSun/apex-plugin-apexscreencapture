@@ -5,6 +5,8 @@ The screenshot is based on the DOM and as such may not be 100% accurate to the r
 **Works best in modern browsers** [For more informations visit html2canvas](https://github.com/niklasvh/html2canvas)
 
 ##Changelog
+####1.1 - Set default width/height to browser dimensions for JQuery selectors
+
 ####1.0 - Initial Release
 
 ##Install

@@ -22,6 +22,15 @@ function captureScreen() {
   var vletterRendering = Boolean(daThis.action.attribute07);
   var vallowTaint      = Boolean(daThis.action.attribute08);
   var vlogging         = Boolean(daThis.action.attribute09);
+  // device width/height
+  var clientWidth  = parseInt(document.documentElement.clientWidth);
+  var clientHeight = parseInt(document.documentElement.clientHeight);
+  if (vwidth == null || vwidth == undefined || isNaN(parseFloat(vwidth))) {
+    vwidth = clientWidth;
+  }
+  if (vheight == null || vheight == undefined || isNaN(parseFloat(vheight))) {
+    vheight = clientHeight;
+  }
   // html2canvas
   html2canvas($(vhtmlElem), {
     onrendered: function(canvas) {
