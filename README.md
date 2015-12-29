@@ -57,5 +57,5 @@ https://apex.oracle.com/pls/apex/f?p=57743:14
 ##Preview
 ![](https://github.com/Dani3lSun/apex-plugin-apexscreencapture/blob/master/preview.gif)
 ---
-[html2canvas](https://github.com/niklasvh/html2canvas)
-[Dom Outline](https://github.com/andrewchilds/jQuery.DomOutline)
+- [html2canvas](https://github.com/niklasvh/html2canvas)
+- [ JQuery DOM Outline](https://github.com/andrewchilds/jQuery.DomOutline)
