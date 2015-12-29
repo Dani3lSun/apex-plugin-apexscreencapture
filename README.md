@@ -5,6 +5,8 @@ The screenshot is based on the DOM and as such may not be 100% accurate to the r
 **Works best in modern browsers** [For more informations visit html2canvas](https://github.com/niklasvh/html2canvas)
 
 ##Changelog
+####1.2 - Added possibility to capture part of screen with a graphical DOM selector (Choose DIV with your mouse cursor)
+
 ####1.1 - Set default width/height to browser dimensions for JQuery selectors
 
 ####1.0 - Initial Release
@@ -15,6 +17,7 @@ The screenshot is based on the DOM and as such may not be 100% accurate to the r
 
 ##Plugin Settings
 The plugin settings are highly customizable and you can change:
+- DOM UI Selector - Choose if a graphical selector should be used or not.
 - JQuery Selector - Enter the JQuery Selector that should be captured
 - Open image in new tab (or save to Item) - Choose whether the image should be opened in a new tab or saved as base64 png to an APEX item
 - Item Picker - Item which holds the base64 png image informations
@@ -54,3 +57,5 @@ https://apex.oracle.com/pls/apex/f?p=57743:14
 ##Preview
 ![](https://github.com/Dani3lSun/apex-plugin-apexscreencapture/blob/master/preview.gif)
 ---
+[html2canvas](https://github.com/niklasvh/html2canvas)
+[Dom Outline](https://github.com/andrewchilds/jQuery.DomOutline)
