@@ -19,18 +19,18 @@ The screenshot is based on the DOM and as such may not be 100% accurate to the r
 
 ##Plugin Settings
 The plugin settings are highly customizable and you can change:
-- DOM UI Selector - Choose if a graphical selector should be used or not.
-- DOM Filter - A selector that an element should match in order to be outlined and clicked. Default is 'div'. No value means no filter is enabled and all elements would be outlined.
-- Hide Label - Shows/Hides a label above the visual indicator. The label contains the element's name, id, class name, and dimensions.
-- JQuery Selector - Enter the JQuery Selector that should be captured
-- Open image in new tab (or save to Item) - Choose whether the image should be opened in a new tab or saved as base64 png to an APEX item
-- Item Picker - Item which holds the base64 png image informations
-- Background color - Canvas background color, if none is specified in DOM. Set undefined for transparent
-- Width - Width in pixels (default screen width)
-- Height - Height in pixels (default screen height)
-- Letter rendering - Whether to render each letter separately
-- Allow taint - Whether to allow cross-origin images to taint the canvas
-- Logging - Whether to log events in the console
+- **DOM UI Selector** - Choose if a graphical selector should be used or not.
+- **DOM Filter** - A selector that an element should match in order to be outlined and clicked. Default is 'div'. No value means no filter is enabled and all elements would be outlined.
+- **Hide Label** - Shows/Hides a label above the visual indicator. The label contains the element's name, id, class name, and dimensions.
+- **JQuery Selector** - Enter the JQuery Selector that should be captured
+- **Open image in new tab (or save to Item)** - Choose whether the image should be opened in a new tab or saved as base64 png to an APEX item
+- **Item Picker** - Item which holds the base64 png image informations
+- **Background color** - Canvas background color, if none is specified in DOM. Set undefined for transparent
+- **Width** - Width in pixels (default screen width)
+- **Height** - Height in pixels (default screen height)
+- **Letter rendering** - Whether to render each letter separately
+- **Allow taint** - Whether to allow cross-origin images to taint the canvas
+- **Logging** - Whether to log events in the console
 
 ## How to use
 - Create for example a new Dynamic Action with event "on button click"
