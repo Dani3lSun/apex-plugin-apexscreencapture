@@ -5,6 +5,8 @@ The screenshot is based on the DOM and as such may not be 100% accurate to the r
 **Works best in modern browsers** [For more informations visit html2canvas](https://github.com/niklasvh/html2canvas)
 
 ##Changelog
+####1.3 - Added options to choose a filter of graphical DOM selector / Hide label of graphical DOM selector
+
 ####1.2 - Added possibility to capture part of screen with a graphical DOM selector (Choose DIV with your mouse cursor)
 
 ####1.1 - Set default width/height to browser dimensions for JQuery selectors
@@ -18,6 +20,8 @@ The screenshot is based on the DOM and as such may not be 100% accurate to the r
 ##Plugin Settings
 The plugin settings are highly customizable and you can change:
 - DOM UI Selector - Choose if a graphical selector should be used or not.
+- DOM Filter - A selector that an element should match in order to be outlined and clicked. Default is 'div'. No value means no filter is enabled and all elements would be outlined.
+- Hide Label - Shows/Hides a label above the visual indicator. The label contains the element's name, id, class name, and dimensions.
 - JQuery Selector - Enter the JQuery Selector that should be captured
 - Open image in new tab (or save to Item) - Choose whether the image should be opened in a new tab or saved as base64 png to an APEX item
 - Item Picker - Item which holds the base64 png image informations

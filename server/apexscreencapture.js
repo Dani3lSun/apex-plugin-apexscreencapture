@@ -81,17 +81,19 @@ function dohtml2canvasDom(pElement,popenWindow,pitemName,pbackground,pletterRend
 
 function captureScreen() {
   // plugin attributes
-  var daThis           = this;
-  var vhtmlElem        = daThis.action.attribute01;
-  var vopenWindow      = daThis.action.attribute02;
-  var vitemName        = daThis.action.attribute03;
-  var vbackground      = daThis.action.attribute04;
-  var vwidth           = parseInt(daThis.action.attribute05);
-  var vheight          = parseInt(daThis.action.attribute06);
-  var vletterRendering = parseBoolean(daThis.action.attribute07);
-  var vallowTaint      = parseBoolean(daThis.action.attribute08);
-  var vlogging         = parseBoolean(daThis.action.attribute09);
-  var vdomSelector     = daThis.action.attribute10;
+  var daThis            = this;
+  var vhtmlElem         = daThis.action.attribute01;
+  var vopenWindow       = daThis.action.attribute02;
+  var vitemName         = daThis.action.attribute03;
+  var vbackground       = daThis.action.attribute04;
+  var vwidth            = parseInt(daThis.action.attribute05);
+  var vheight           = parseInt(daThis.action.attribute06);
+  var vletterRendering  = parseBoolean(daThis.action.attribute07);
+  var vallowTaint       = parseBoolean(daThis.action.attribute08);
+  var vlogging          = parseBoolean(daThis.action.attribute09);
+  var vdomSelector      = daThis.action.attribute10;
+  var vdomFilter        = daThis.action.attribute11;
+  var vdomhideLabel     = parseBoolean(daThis.action.attribute12);
   // device width/height
   var clientWidth  = parseInt(document.documentElement.clientWidth);
   var clientHeight = parseInt(document.documentElement.clientHeight);
@@ -100,6 +102,13 @@ function captureScreen() {
   }
   if (vheight == null || vheight == undefined || isNaN(parseFloat(vheight))) {
     vheight = clientHeight;
+  }
+  // defaults for DOM Outliner
+  if (vdomFilter == null || vdomFilter == undefined) {
+    vdomFilter = false;
+  }
+  if (vdomhideLabel == null || vdomhideLabel == undefined) {
+    vdomhideLabel = false;
   }
   // Logging
   if (vlogging) {
@@ -113,15 +122,17 @@ function captureScreen() {
     console.log('captureScreen: Attribute allow taint:',vallowTaint);
     console.log('captureScreen: Attribute Logging:',vlogging);
     console.log('captureScreen: Attribute DOM selector:',vdomSelector);
+    console.log('captureScreen: Attribute DOM filter:',vdomFilter);
+    console.log('captureScreen: Attribute hide label:',vdomhideLabel);
   }
   if (vdomSelector == 'Y') {
   // html2canvas with DOM Outliner
   var myClickHandler = function (element) { dohtml2canvasDom(element,vopenWindow,vitemName,vbackground,vletterRendering,vallowTaint,vlogging); }
   var myDomOutline = DomOutline({
     onClick: myClickHandler,
-    filter: 'div',
+    filter: vdomFilter,
     stopOnClick: true,
-    hideLabel: false
+    hideLabel: vdomhideLabel
   });
   myDomOutline.start();
   } else {

@@ -1,6 +1,6 @@
 /*-------------------------------------
  * APEX Screen Capture functions
- * Version: 1.2 (29.12.2015)
+ * Version: 1.3 (30.12.2015)
  * Author:  Daniel Hochleitner
  *-------------------------------------
 */
@@ -20,6 +20,8 @@ FUNCTION render_screencapture(p_dynamic_action IN apex_plugin.t_dynamic_action,
   l_allow_taint      VARCHAR2(50) := p_dynamic_action.attribute_08;
   l_logging          VARCHAR2(50) := p_dynamic_action.attribute_09;
   l_dom_selector     VARCHAR2(50) := p_dynamic_action.attribute_10;
+  l_dom_filter       VARCHAR2(100) := p_dynamic_action.attribute_11;
+  l_dom_hidelabel    VARCHAR2(50) := p_dynamic_action.attribute_12;
   --
 BEGIN
   -- Debug
@@ -51,6 +53,20 @@ BEGIN
                               p_directory      => p_plugin.file_prefix,
                               p_version        => NULL,
                               p_skip_extension => FALSE);
+  -- attribute defaults
+  l_open_window      := nvl(l_open_window,
+                            'Y');
+  l_dom_selector     := nvl(l_dom_selector,
+                            'N');
+  l_letter_rendering := nvl(l_letter_rendering,
+                            'false');
+  l_allow_taint      := nvl(l_allow_taint,
+                            'false');
+  l_dom_hidelabel    := nvl(l_dom_hidelabel,
+                            'false');
+  l_logging          := nvl(l_logging,
+                            'false');
+  --
   --
   l_result.javascript_function := 'captureScreen';
   l_result.attribute_01        := l_html_elem;
@@ -63,6 +79,8 @@ BEGIN
   l_result.attribute_08        := l_allow_taint;
   l_result.attribute_09        := l_logging;
   l_result.attribute_10        := l_dom_selector;
+  l_result.attribute_11        := l_dom_filter;
+  l_result.attribute_12        := l_dom_hidelabel;
   --
   RETURN l_result;
   --

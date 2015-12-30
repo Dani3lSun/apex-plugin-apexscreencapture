@@ -20,7 +20,9 @@ var DomOutline = function (options) {
             namespace: options.namespace || 'DomOutline',
             borderWidth: options.borderWidth || 2,
             onClick: options.onClick || false,
-            filter: options.filter || false
+            filter: options.filter || false,
+            dontStop: !options.stopOnClick || false,
+            hideLabel: options.hideLabel || false
         },
         keyCodes: {
             BACKSPACE: 8,
@@ -32,6 +34,7 @@ var DomOutline = function (options) {
         elements: {}
     };
 
+  
     function writeStylesheet(css) {
         var element = document.createElement('style');
         element.type = 'text/css';
@@ -61,6 +64,9 @@ var DomOutline = function (options) {
                 '    position: absolute;' +
                 '    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);' +
                 '    z-index: 1000001;' +
+                '}' +
+                '.' + self.opts.namespace + '_label.hidden {' +
+                '    display: none;' +
                 '}';
 
             writeStylesheet(css);
@@ -69,7 +75,7 @@ var DomOutline = function (options) {
     }
 
     function createOutlineElements() {
-        self.elements.label = jQuery('<div></div>').addClass(self.opts.namespace + '_label').appendTo('body');
+        self.elements.label = jQuery('<div></div>').addClass(self.opts.namespace + '_label hidden').appendTo('body');
         self.elements.top = jQuery('<div></div>').addClass(self.opts.namespace).appendTo('body');
         self.elements.bottom = jQuery('<div></div>').addClass(self.opts.namespace).appendTo('body');
         self.elements.left = jQuery('<div></div>').addClass(self.opts.namespace).appendTo('body');
@@ -101,15 +107,22 @@ var DomOutline = function (options) {
     }
 
     function updateOutlinePosition(e) {
-        if (e.target.className.indexOf(self.opts.namespace) !== -1) {
-            return;
+        if(e.type != 'resize'){
+          if (e.target.className && e.target.className.indexOf(self.opts.namespace) !== -1) {
+              return;
+          }
+          if (self.opts.filter) {
+              if (!jQuery(e.target).is(self.opts.filter)) {
+                  return;
+              }
+          }
+          pub.element = e.target
+        } else {
+          if(!pub.element) return;
         }
-        if (self.opts.filter) {
-            if (!jQuery(e.target).is(self.opts.filter)) {
-                return;
-            }
-        }      
-        pub.element = e.target;
+      
+        if(!self.opts.hideLabel) 
+          jQuery('.' + self.opts.namespace + '_label').removeClass('hidden');
 
         var b = self.opts.borderWidth;
         var scroll_top = getScrollTop();
@@ -117,6 +130,8 @@ var DomOutline = function (options) {
         var top = pos.top + scroll_top;
 
         var label_text = compileLabelText(pub.element, pos.width, pos.height);
+        pub.element.label = label_text;
+        
         var label_top = Math.max(0, top - 20 - b, scroll_top);
         var label_left = Math.max(0, pos.left - b);
 
