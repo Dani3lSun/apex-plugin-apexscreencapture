@@ -19,10 +19,12 @@ var DomOutline = function (options) {
         opts: {
             namespace: options.namespace || 'DomOutline',
             borderWidth: options.borderWidth || 2,
+            borderColor: options.borderColor || '#09c',
             onClick: options.onClick || false,
             filter: options.filter || false,
             dontStop: !options.stopOnClick || false,
-            hideLabel: options.hideLabel || false
+            hideLabel: options.hideLabel || false,
+            fillContent: options.fillContent || false
         },
         keyCodes: {
             BACKSPACE: 8,
@@ -33,6 +35,37 @@ var DomOutline = function (options) {
         initialized: false,
         elements: {}
     };
+    
+    function ColorLuminance(hex, lum) {
+	    // validate hex string
+	    hex = String(hex).replace(/[^0-9a-f]/gi, '');
+	    if (hex.length < 6) {
+		    hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+	    }
+	    lum = lum || 0;
+	    // convert to decimal and change luminosity
+	    var rgb = "#", c, i;
+	    for (i = 0; i < 3; i++) {
+		    c = parseInt(hex.substr(i*2,2), 16);
+		    c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
+		    rgb += ("00"+c).substr(c.length);
+	    }
+	    return rgb;
+    }
+
+    function hexToRgb(hex) {
+        // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+        var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+        hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+            return r + r + g + g + b + b;
+        });
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+    }
 
   
     function writeStylesheet(css) {
@@ -49,14 +82,18 @@ var DomOutline = function (options) {
 
     function initStylesheet() {
         if (self.initialized !== true) {
+            // 30% darker color for content
+            var contentColor = ColorLuminance(self.opts.borderColor, -0.3);
+            var contentColorRGB = hexToRgb(contentColor).r + ', ' + hexToRgb(contentColor).g + ', ' + hexToRgb(contentColor).b;
+            // build css
             var css = '' +
                 '.' + self.opts.namespace + ' {' +
-                '    background: #09c;' +
+                '    background: ' + self.opts.borderColor + ';' +
                 '    position: absolute;' +
                 '    z-index: 1000000;' +
                 '}' +
                 '.' + self.opts.namespace + '_label {' +
-                '    background: #09c;' +
+                '    background: ' + self.opts.borderColor + ';' +
                 '    border-radius: 2px;' +
                 '    color: #fff;' +
                 '    font: bold 12px/12px Helvetica, sans-serif;' +
@@ -67,6 +104,10 @@ var DomOutline = function (options) {
                 '}' +
                 '.' + self.opts.namespace + '_label.hidden {' +
                 '    display: none;' +
+                '}' +
+                '.' + self.opts.namespace + '_fill_content {' +
+                '    background: rgba(' + contentColorRGB + ', 0.3) !important;' +
+                '    background-color: rgba(' + contentColorRGB + ', 0.3) !important;' +
                 '}';
 
             writeStylesheet(css);
@@ -128,9 +169,14 @@ var DomOutline = function (options) {
         var scroll_top = getScrollTop();
         var pos = pub.element.getBoundingClientRect();
         var top = pos.top + scroll_top;
-
         var label_text = compileLabelText(pub.element, pos.width, pos.height);
         pub.element.label = label_text;
+        // fill content
+        if (self.opts.fillContent) {
+          $('body').find('.' + self.opts.namespace + '_fill_content').removeClass(self.opts.namespace + '_fill_content');
+          $(pub.element).addClass(self.opts.namespace + '_fill_content');
+          $(pub.element).find('*').addClass(self.opts.namespace + '_fill_content');
+        }
         
         var label_top = Math.max(0, top - 20 - b, scroll_top);
         var label_left = Math.max(0, pos.left - b);
@@ -182,6 +228,9 @@ var DomOutline = function (options) {
     pub.stop = function () {
         self.active = false;
         removeOutlineElements();
+        if (self.opts.fillContent) {
+         $('body').find('.' + self.opts.namespace + '_fill_content').removeClass(self.opts.namespace + '_fill_content');
+        }
         jQuery('body').off('mousemove.' + self.opts.namespace)
             .off('keyup.' + self.opts.namespace)
             .off('click.' + self.opts.namespace);

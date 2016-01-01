@@ -1,6 +1,6 @@
 /*-------------------------------------
  * APEX Screen Capture functions
- * Version: 1.3 (30.12.2015)
+ * Version: 1.4 (01.01.2016)
  * Author:  Daniel Hochleitner
  *-------------------------------------
 */
@@ -22,6 +22,8 @@ FUNCTION render_screencapture(p_dynamic_action IN apex_plugin.t_dynamic_action,
   l_dom_selector     VARCHAR2(50) := p_dynamic_action.attribute_10;
   l_dom_filter       VARCHAR2(100) := p_dynamic_action.attribute_11;
   l_dom_hidelabel    VARCHAR2(50) := p_dynamic_action.attribute_12;
+  l_dom_fillcontent  VARCHAR2(50) := p_dynamic_action.attribute_13;
+  l_border_color     VARCHAR2(50) := p_dynamic_action.attribute_14;
   --
 BEGIN
   -- Debug
@@ -64,6 +66,10 @@ BEGIN
                             'false');
   l_dom_hidelabel    := nvl(l_dom_hidelabel,
                             'false');
+  l_dom_fillcontent  := nvl(l_dom_fillcontent,
+                            'false');
+  l_border_color     := nvl(l_border_color,
+                            '#09c');
   l_logging          := nvl(l_logging,
                             'false');
   --
@@ -81,6 +87,8 @@ BEGIN
   l_result.attribute_10        := l_dom_selector;
   l_result.attribute_11        := l_dom_filter;
   l_result.attribute_12        := l_dom_hidelabel;
+  l_result.attribute_13        := l_dom_fillcontent;
+  l_result.attribute_14        := l_border_color;
   --
   RETURN l_result;
   --

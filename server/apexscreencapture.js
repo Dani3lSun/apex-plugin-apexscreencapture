@@ -81,19 +81,21 @@ function dohtml2canvasDom(pElement,popenWindow,pitemName,pbackground,pletterRend
 
 function captureScreen() {
   // plugin attributes
-  var daThis            = this;
-  var vhtmlElem         = daThis.action.attribute01;
-  var vopenWindow       = daThis.action.attribute02;
-  var vitemName         = daThis.action.attribute03;
-  var vbackground       = daThis.action.attribute04;
-  var vwidth            = parseInt(daThis.action.attribute05);
-  var vheight           = parseInt(daThis.action.attribute06);
-  var vletterRendering  = parseBoolean(daThis.action.attribute07);
-  var vallowTaint       = parseBoolean(daThis.action.attribute08);
-  var vlogging          = parseBoolean(daThis.action.attribute09);
-  var vdomSelector      = daThis.action.attribute10;
-  var vdomFilter        = daThis.action.attribute11;
-  var vdomhideLabel     = parseBoolean(daThis.action.attribute12);
+  var daThis              = this;
+  var vhtmlElem           = daThis.action.attribute01;
+  var vopenWindow         = daThis.action.attribute02;
+  var vitemName           = daThis.action.attribute03;
+  var vbackground         = daThis.action.attribute04;
+  var vwidth              = parseInt(daThis.action.attribute05);
+  var vheight             = parseInt(daThis.action.attribute06);
+  var vletterRendering    = parseBoolean(daThis.action.attribute07);
+  var vallowTaint         = parseBoolean(daThis.action.attribute08);
+  var vlogging            = parseBoolean(daThis.action.attribute09);
+  var vdomSelector        = daThis.action.attribute10;
+  var vdomFilter          = daThis.action.attribute11;
+  var vdomhideLabel       = parseBoolean(daThis.action.attribute12);
+  var vdomfillContent     = parseBoolean(daThis.action.attribute13);
+  var vdomborderColor     = daThis.action.attribute14;
   // device width/height
   var clientWidth  = parseInt(document.documentElement.clientWidth);
   var clientHeight = parseInt(document.documentElement.clientHeight);
@@ -110,6 +112,9 @@ function captureScreen() {
   if (vdomhideLabel == null || vdomhideLabel == undefined) {
     vdomhideLabel = false;
   }
+  if (vdomfillContent == null || vdomfillContent == undefined) {
+    vdomfillContent = false;
+  }
   // Logging
   if (vlogging) {
     console.log('captureScreen: Attribute JQuery selector:',vhtmlElem);
@@ -124,6 +129,8 @@ function captureScreen() {
     console.log('captureScreen: Attribute DOM selector:',vdomSelector);
     console.log('captureScreen: Attribute DOM filter:',vdomFilter);
     console.log('captureScreen: Attribute hide label:',vdomhideLabel);
+    console.log('captureScreen: Attribute fill content:',vdomfillContent);
+    console.log('captureScreen: Attribute border color:',vdomborderColor);
   }
   if (vdomSelector == 'Y') {
   // html2canvas with DOM Outliner
@@ -132,7 +139,9 @@ function captureScreen() {
     onClick: myClickHandler,
     filter: vdomFilter,
     stopOnClick: true,
-    hideLabel: vdomhideLabel
+    borderColor: vdomborderColor,
+    hideLabel: vdomhideLabel,
+    fillContent: vdomfillContent
   });
   myDomOutline.start();
   } else {
