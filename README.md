@@ -5,6 +5,8 @@ The screenshot is based on the DOM and as such may not be 100% accurate to the r
 **Works best in modern browsers** [For more informations visit html2canvas](https://github.com/niklasvh/html2canvas)
 
 ##Changelog
+####1.4 - Added options to pick a border color of your choice / fill the selector´s content with light transparent color (based on border color)
+
 ####1.3 - Added options to choose a filter of graphical DOM selector / Hide label of graphical DOM selector
 
 ####1.2 - Added possibility to capture part of screen with a graphical DOM selector (Choose DIV with your mouse cursor)
@@ -22,6 +24,8 @@ The plugin settings are highly customizable and you can change:
 - **DOM UI Selector** - Choose if a graphical selector should be used or not.
 - **DOM Filter** - A selector that an element should match in order to be outlined and clicked. Default is 'div'. No value means no filter is enabled and all elements would be outlined.
 - **Hide Label** - Shows/Hides a label above the visual indicator. The label contains the element's name, id, class name, and dimensions.
+- **Selector Border Color** - Color of the DOM selector outline
+- **Selector Fill Content** - Whether the content of a selected area is filled with color or not. (30% darker than selector´s border color)
 - **JQuery Selector** - Enter the JQuery Selector that should be captured
 - **Open image in new tab (or save to Item)** - Choose whether the image should be opened in a new tab or saved as base64 png to an APEX item
 - **Item Picker** - Item which holds the base64 png image informations
