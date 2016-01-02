@@ -41,6 +41,7 @@ The plugin settings are highly customizable and you can change:
 - As action choose "APEX Screen Capture".
 - Choose best fitting plugin attributes (help included)
 
+####Convert image to blob in PL/SQL
 If you choose to save the screenshot (data uri base64 png) to an APEX item you can use a PL/SQL function like this to convert it to BLOB:
 
 ```language-sql
@@ -59,6 +60,7 @@ BEGIN
 END png2blob;
 ```
 
+####Excluding page areas from getting rendered
 If you would like to exclude some areas from getting rendered to the resulting image, just add
 
 ```
