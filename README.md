@@ -41,7 +41,7 @@ The plugin settings are highly customizable and you can change:
 - As action choose "APEX Screen Capture".
 - Choose best fitting plugin attributes (help included)
 
-####Convert image to blob in PL/SQL
+####Convert image to BLOB in PL/SQL
 If you choose to save the screenshot (data uri base64 png) to an APEX item you can use a PL/SQL function like this to convert it to BLOB:
 
 ```language-sql
@@ -68,7 +68,7 @@ data-html2canvas-ignore="true"
 ```
 
 to a element or a region or something else.
-If you would like to exclude a complete region add the "data-html2canvas-ignore" attribute to the "Custom Attributes" field in APEX Page Designer.
+If you would like to exclude a complete region add the "data-html2canvas-ignore" attribute to the "Custom Attributes" field of a region in APEX Page Designer.
 
 
 ##Demo Application
