@@ -59,6 +59,16 @@ BEGIN
 END png2blob;
 ```
 
+If you would like to exclude some areas from getting rendered to the resulting image, just add
+
+```
+data-html2canvas-ignore="true"
+```
+
+to a element or a region or something else.
+If you would like to exclude a complete region add the "data-html2canvas-ignore" attribute to the "Custom Attributes" field in APEX Page Designer.
+
+
 ##Demo Application
 https://apex.oracle.com/pls/apex/f?p=57743:14
 
