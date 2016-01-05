@@ -12,7 +12,20 @@ function parseBoolean(pString) {
   return pBoolean;
 }
 
-function getImage(itemName,canvas,openWindow) {
+function setApexCollectionClob (pBigValue, callback) {
+  var apexAjaxObj = new apex.ajax.clob (
+  function() {
+    var rs = p.readyState;
+    if (rs == 4) {
+      callback();
+    } else {
+      return false;
+    };
+  });
+  apexAjaxObj._set(pBigValue);
+}
+
+function getImage(ajaxIdentifier,canvas,openWindow) {
   var img    = canvas.toDataURL("image/png");
   if (openWindow == 'Y') {
     if (navigator.vendor.indexOf("Apple")==0 && /\sSafari\//.test(navigator.userAgent)) {
@@ -21,11 +34,14 @@ function getImage(itemName,canvas,openWindow) {
     window.open(img,'_blank');
     }
   } else {
-    apex.item(itemName).setValue(img);
+    setApexCollectionClob (img, function(){apex.server.plugin(ajaxIdentifier, {
+                                            x01: ''
+                                            },{dataType: 'xml'});
+                                           })
   }
 }
 
-function dohtml2canvas(phtmlElem,popenWindow,pitemName,pbackground,pwidth,pheight,pletterRendering,pallowTaint,plogging) {
+function dohtml2canvas(phtmlElem,popenWindow,pAjaxIdentifier,pbackground,pwidth,pheight,pletterRendering,pallowTaint,plogging) {
   // Logging
   if (plogging) {
     console.log('dohtml2canvas: HTML element:',phtmlElem);
@@ -35,7 +51,7 @@ function dohtml2canvas(phtmlElem,popenWindow,pitemName,pbackground,pwidth,pheigh
   // html2canvas
   html2canvas($(phtmlElem), {
     onrendered: function(canvas) {
-      getImage(pitemName,canvas,popenWindow);
+      getImage(pAjaxIdentifier,canvas,popenWindow);
     },
     background : pbackground,
     width: pwidth,
@@ -46,7 +62,7 @@ function dohtml2canvas(phtmlElem,popenWindow,pitemName,pbackground,pwidth,pheigh
   });
 }
 
-function dohtml2canvasDom(pElement,popenWindow,pitemName,pbackground,pletterRendering,pallowTaint,plogging) {
+function dohtml2canvasDom(pElement,popenWindow,pAjaxIdentifier,pbackground,pletterRendering,pallowTaint,plogging) {
   // Parameter
     if (pElement.id) {
       phtmlElem = '#' + pElement.id;
@@ -68,7 +84,7 @@ function dohtml2canvasDom(pElement,popenWindow,pitemName,pbackground,pletterRend
   // html2canvas
   html2canvas($(phtmlElem), {
     onrendered: function(canvas) {
-      getImage(pitemName,canvas,popenWindow);
+      getImage(pAjaxIdentifier,canvas,popenWindow);
     },
     background : pbackground,
     width: pwidth,
@@ -82,9 +98,9 @@ function dohtml2canvasDom(pElement,popenWindow,pitemName,pbackground,pletterRend
 function captureScreen() {
   // plugin attributes
   var daThis              = this;
+  var vAjaxIdentifier     = daThis.action.ajaxIdentifier;
   var vhtmlElem           = daThis.action.attribute01;
   var vopenWindow         = daThis.action.attribute02;
-  var vitemName           = daThis.action.attribute03;
   var vbackground         = daThis.action.attribute04;
   var vwidth              = parseInt(daThis.action.attribute05);
   var vheight             = parseInt(daThis.action.attribute06);
@@ -119,7 +135,6 @@ function captureScreen() {
   if (vlogging) {
     console.log('captureScreen: Attribute JQuery selector:',vhtmlElem);
     console.log('captureScreen: Attribute open window:',vopenWindow);
-    console.log('captureScreen: Attribute item name:',vitemName);
     console.log('captureScreen: Attribute background:',vbackground);
     console.log('captureScreen: Attribute element width:',vwidth);
     console.log('captureScreen: Attribute element height:',vheight);
@@ -134,7 +149,7 @@ function captureScreen() {
   }
   if (vdomSelector == 'Y') {
   // html2canvas with DOM Outliner
-  var myClickHandler = function (element) { dohtml2canvasDom(element,vopenWindow,vitemName,vbackground,vletterRendering,vallowTaint,vlogging); }
+  var myClickHandler = function (element) { dohtml2canvasDom(element,vopenWindow,vAjaxIdentifier,vbackground,vletterRendering,vallowTaint,vlogging); }
   var myDomOutline = DomOutline({
     onClick: myClickHandler,
     filter: vdomFilter,
@@ -146,6 +161,6 @@ function captureScreen() {
   myDomOutline.start();
   } else {
   // html2canvas
-  dohtml2canvas(vhtmlElem,vopenWindow,vitemName,vbackground,vwidth,vheight,vletterRendering,vallowTaint,vlogging);
+  dohtml2canvas(vhtmlElem,vopenWindow,vAjaxIdentifier,vbackground,vwidth,vheight,vletterRendering,vallowTaint,vlogging);
   }
 }

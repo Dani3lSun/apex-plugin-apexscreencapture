@@ -1,6 +1,6 @@
 /*-------------------------------------
  * APEX Screen Capture functions
- * Version: 1.4 (01.01.2016)
+ * Version: 1.5 (05.01.2016)
  * Author:  Daniel Hochleitner
  *-------------------------------------
 */
@@ -12,7 +12,7 @@ FUNCTION render_screencapture(p_dynamic_action IN apex_plugin.t_dynamic_action,
   l_result           apex_plugin.t_dynamic_action_render_result;
   l_html_elem        VARCHAR2(200) := p_dynamic_action.attribute_01;
   l_open_window      VARCHAR2(10) := p_dynamic_action.attribute_02;
-  l_item_name        VARCHAR2(100) := p_dynamic_action.attribute_03;
+  l_plsql            p_dynamic_action.attribute_03%TYPE := p_dynamic_action.attribute_03;
   l_background       VARCHAR2(10) := p_dynamic_action.attribute_04;
   l_width            NUMBER := p_dynamic_action.attribute_05;
   l_height           NUMBER := p_dynamic_action.attribute_06;
@@ -75,9 +75,10 @@ BEGIN
   --
   --
   l_result.javascript_function := 'captureScreen';
+  l_result.ajax_identifier     := apex_plugin.get_ajax_identifier;
   l_result.attribute_01        := l_html_elem;
   l_result.attribute_02        := l_open_window;
-  l_result.attribute_03        := l_item_name;
+  l_result.attribute_03        := l_plsql;
   l_result.attribute_04        := l_background;
   l_result.attribute_05        := l_width;
   l_result.attribute_06        := l_height;
@@ -93,3 +94,24 @@ BEGIN
   RETURN l_result;
   --
 END render_screencapture;
+--
+--
+-- AJAX function
+--
+--
+FUNCTION ajax_screencapture(p_dynamic_action IN apex_plugin.t_dynamic_action,
+                            p_plugin         IN apex_plugin.t_plugin)
+  RETURN apex_plugin.t_dynamic_action_ajax_result IS
+  --
+  -- plugin attributes
+  l_result apex_plugin.t_dynamic_action_ajax_result;
+  l_plsql  p_dynamic_action.attribute_03%TYPE := p_dynamic_action.attribute_03;
+  --
+BEGIN
+  -- execute PL/SQL
+  apex_plugin_util.execute_plsql_code(p_plsql_code => l_plsql);
+  --
+  --
+  RETURN l_result;
+  --
+END ajax_screencapture;
