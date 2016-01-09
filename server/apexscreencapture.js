@@ -1,3 +1,8 @@
+// APEX Screen capture functions
+// Author: Daniel Hochleitner
+// Version: 1.6
+
+// parse string to boolean
 function parseBoolean(pString) {
   var pBoolean;
   if (pString.toLowerCase() == 'true') {
@@ -11,20 +16,20 @@ function parseBoolean(pString) {
   }
   return pBoolean;
 }
-
-function setApexCollectionClob (pBigValue, callback) {
-  var apexAjaxObj = new apex.ajax.clob (
-  function() {
-    var rs = p.readyState;
-    if (rs == 4) {
-      callback();
-    } else {
-      return false;
-    };
-  });
-  apexAjaxObj._set(pBigValue);
+// builds a js array from long string
+function clob2Array(clob,size,array){
+  loopCount = Math.floor(clob.length / size) + 1;
+  for (var i = 0; i < loopCount; i++) {
+    array.push(clob.slice(size * i,size*(i+1)));
+  }
+  return array;
 }
-
+// converts DataURI to base64 string
+function dataURI2base64(dataURI){
+    var base64 = dataURI.substr(dataURI.indexOf(',')+1);
+    return base64;
+}
+// get Image (DataURI to Tab / base64 to Apex Ajax)
 function getImage(ajaxIdentifier,canvas,openWindow) {
   var img    = canvas.toDataURL("image/png");
   if (openWindow == 'Y') {
@@ -34,13 +39,18 @@ function getImage(ajaxIdentifier,canvas,openWindow) {
     window.open(img,'_blank');
     }
   } else {
-    setApexCollectionClob (img, function(){apex.server.plugin(ajaxIdentifier, {
-                                            x01: ''
-                                            },{dataType: 'xml'});
-                                           })
+    // img DataURI to base64
+    var base64 = dataURI2base64(img);
+    // split base64 clob string to f01 array length 30k
+    var f01Array = [];
+    f01Array = clob2Array(base64,30000,f01Array);
+    // Apex Ajax Call
+    apex.server.plugin(ajaxIdentifier, {
+                                  f01: f01Array
+                                  },{dataType: 'xml'});
   }
 }
-
+// html2canvas function
 function dohtml2canvas(phtmlElem,popenWindow,pAjaxIdentifier,pbackground,pwidth,pheight,pletterRendering,pallowTaint,plogging) {
   // Logging
   if (plogging) {
@@ -61,7 +71,7 @@ function dohtml2canvas(phtmlElem,popenWindow,pAjaxIdentifier,pbackground,pwidth,
     logging : plogging
   });
 }
-
+// html2canvas with DOM selector function
 function dohtml2canvasDom(pElement,popenWindow,pAjaxIdentifier,pbackground,pletterRendering,pallowTaint,plogging) {
   // Parameter
     if (pElement.id) {
@@ -94,7 +104,7 @@ function dohtml2canvasDom(pElement,popenWindow,pAjaxIdentifier,pbackground,plett
     logging : plogging
   });
 }
-
+// function that gets called from plugin
 function captureScreen() {
   // plugin attributes
   var daThis              = this;
