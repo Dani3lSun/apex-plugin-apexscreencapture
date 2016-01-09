@@ -46,63 +46,45 @@ The plugin settings are highly customizable and you can change:
 - Choose best fitting plugin attributes (help included)
 
 ####Convert image to BLOB in PL/SQL / save to DB
-If you choose to save the screenshot (data uri base64 png) to DB you can use a PL/SQL function like this to convert it to BLOB:
-
-```language-sql
-CREATE OR REPLACE FUNCTION png2blob(i_clob IN CLOB) RETURN BLOB IS
-  l_clob_base64 CLOB;
-  l_blob        BLOB;
-  --
-BEGIN
-  -- cut out the data uri string
-  l_clob_base64 := ltrim(i_clob,
-                         'data:image/png;base64,');
-  -- convert base64 to blob (mimetype: image/png)
-  l_blob := apex_web_service.clobbase642blob(p_clob => l_clob_base64);
-  --
-  RETURN l_blob;
-END png2blob;
-```
-
-A sample code for the "PLSQL code" attribute of the plugin could look like this:
+For saving the screenshot (base64 png) to DB you can use a PL/SQL function like this:
 
 ```language-sql
 DECLARE
   --
   l_collection_name VARCHAR2(100);
   l_clob            CLOB;
-  l_clob_base64     CLOB;
   l_blob            BLOB;
   l_filename        VARCHAR2(100);
   l_mime_type       VARCHAR2(100);
+  l_token           VARCHAR2(32000);
   --
 BEGIN
   -- get defaults
-  l_collection_name := 'SCREEN_CAPTURE';
-  l_filename        := 'screenshot_' ||
-                       to_char(SYSDATE,
-                               'YYYYMMDDHH24MISS') || '.png';
-  l_mime_type       := 'image/png';
-  -- get CLOB from APEX special collection
-  SELECT clob001
-    INTO l_clob
-    FROM apex_collections
-   WHERE collection_name = 'CLOB_CONTENT';
+  l_filename  := 'screenshot_' ||
+                 to_char(SYSDATE,
+                         'YYYYMMDDHH24MISS') || '.png';
+  l_mime_type := 'image/png';
+  -- build CLOB from f01 30k Array
+  dbms_lob.createtemporary(l_clob,
+                           FALSE,
+                           dbms_lob.session);
+
+  FOR i IN 1 .. apex_application.g_f01.count LOOP
+    l_token := wwv_flow.g_f01(i);
+  
+    IF length(l_token) > 0 THEN
+      dbms_lob.writeappend(l_clob,
+                           length(l_token),
+                           l_token);
+    END IF;
+  END LOOP;
   --
-  -- escape special chars (similar to png2blob function)
-  l_clob_base64 := REPLACE(REPLACE(REPLACE(REPLACE(l_clob,
-                                                   chr(10),
-                                                   ''),
-                                           chr(13),
-                                           ''),
-                                   chr(9),
-                                   ''),
-                           'data:image/png;base64,',
-                           '');
   -- convert base64 CLOB to BLOB (mimetype: image/png)
-  l_blob := apex_web_service.clobbase642blob(p_clob => l_clob_base64);
+  l_blob := apex_web_service.clobbase642blob(p_clob => l_clob);
   --
-  -- create own collection
+  -- create own collection (here starts custom part (for example a Insert statement))
+  -- collection name
+  l_collection_name := 'SCREEN_CAPTURE';
   -- check if exist
   IF NOT
       apex_collection.collection_exists(p_collection_name => l_collection_name) THEN
