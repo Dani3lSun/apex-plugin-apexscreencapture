@@ -1,6 +1,6 @@
 // APEX Screen capture functions
 // Author: Daniel Hochleitner
-// Version: 1.6
+// Version: 1.7
 
 // parse string to boolean
 function parseBoolean(pString) {
