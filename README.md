@@ -5,6 +5,8 @@ The screenshot is based on the DOM and as such may not be 100% accurate to the r
 **Works best in modern browsers** [For more informations visit html2canvas](https://github.com/niklasvh/html2canvas)
 
 ##Changelog
+####1.8 - added APEX events to plugin, so you can react with other DA on this (for saved to DB & error saving to DB)/ cleaned up js code with own namespace
+
 ####1.7 - added minified css/js files for normal mode and full files for debug mode
 
 ####1.6 - performance improvements(removed redundant AJAX call) / split the clob into a 30k param array (OHS 32k limit for params)
