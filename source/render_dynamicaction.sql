@@ -1,6 +1,6 @@
 /*-------------------------------------
  * APEX Screen Capture functions
- * Version: 1.7 (12.01.2016)
+ * Version: 1.8 (13.01.2016)
  * Author:  Daniel Hochleitner
  *-------------------------------------
 */
@@ -90,7 +90,7 @@ BEGIN
                             'false');
   --
   --
-  l_result.javascript_function := 'captureScreen';
+  l_result.javascript_function := 'apexScreenCapture.captureScreen';
   l_result.ajax_identifier     := apex_plugin.get_ajax_identifier;
   l_result.attribute_01        := l_html_elem;
   l_result.attribute_02        := l_open_window;
