@@ -1,6 +1,6 @@
 {
   "name" : "APEX Screen Capture",
-  "version" : "1.8",
+  "version" : "1.9",
   "description" : "This plugin allows you to take screenshots/captures of pages or parts of it, directly on the users browser.",
   "keywords" : ["screenshot", "capture", "pages", "screen", "image"],
   "homepage" : "https://github.com/Dani3lSun/apex-plugin-apexscreencapture",
@@ -12,7 +12,7 @@
   "author" : {
     "name" : "Daniel Hochleitner",
     "email" : "daniel@danielh.de",
-    "url" : "http://blog.danielh.de/"
+    "url" : "https://danielhochleitner.de"
   },
   "repository" : {
     "type" : "git",
