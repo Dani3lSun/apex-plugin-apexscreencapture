@@ -5,6 +5,8 @@ The screenshot is based on the DOM and as such may not be 100% accurate to the r
 **Works best in modern browsers** [For more informations visit html2canvas](https://github.com/niklasvh/html2canvas)
 
 ## Changelog
+#### 1.9.1 - added option to choose the mime type (PNG or JPEG) of the image which gets saved to DB
+
 #### 1.9 - performance improvements when saving image / added wait spinner to visualize progress / fixed error when opening image in new tab in IE
 
 #### 1.8 - added APEX events to plugin, so you can react with other DA on this (for saved to DB & error saving to DB)/ cleaned up js code with own namespace
@@ -42,6 +44,7 @@ The plugin settings are highly customizable and you can change:
 - **Background color** - Canvas background color, if none is specified in DOM. Set undefined for transparent
 - **Width** - Width in pixels (default screen width)
 - **Height** - Height in pixels (default screen height)
+- **Image Mime-Type** - Mime-Type of the resulting screenshot image
 - **Letter rendering** - Whether to render each letter separately
 - **Allow taint** - Whether to allow cross-origin images to taint the canvas
 - **Logging** - Whether to log events in the console

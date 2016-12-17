@@ -1,6 +1,6 @@
 /*-------------------------------------
  * APEX Screen Capture functions
- * Version: 1.9 (27.09.2016)
+ * Version: 1.9.1 (18.12.2016)
  * Author:  Daniel Hochleitner
  *-------------------------------------
 */
@@ -24,6 +24,7 @@ FUNCTION render_screencapture(p_dynamic_action IN apex_plugin.t_dynamic_action,
   l_dom_hidelabel    VARCHAR2(50) := p_dynamic_action.attribute_12;
   l_dom_fillcontent  VARCHAR2(50) := p_dynamic_action.attribute_13;
   l_border_color     VARCHAR2(50) := p_dynamic_action.attribute_14;
+  l_image_mime_type  VARCHAR2(50) := p_dynamic_action.attribute_15;
   -- js file vars
   l_apexscreencapture_js VARCHAR2(50);
   l_html2canvas_js       VARCHAR2(50);
@@ -86,6 +87,8 @@ BEGIN
                             'false');
   l_border_color     := nvl(l_border_color,
                             '#09c');
+  l_image_mime_type  := nvl(l_image_mime_type,
+                            'PNG');
   l_logging          := nvl(l_logging,
                             'false');
   --
@@ -106,6 +109,7 @@ BEGIN
   l_result.attribute_12        := l_dom_hidelabel;
   l_result.attribute_13        := l_dom_fillcontent;
   l_result.attribute_14        := l_border_color;
+  l_result.attribute_15        := l_image_mime_type;
   --
   RETURN l_result;
   --

@@ -1,6 +1,6 @@
 // APEX Screen capture functions
 // Author: Daniel Hochleitner
-// Version: 1.9
+// Version: 1.9.1
 
 // global namespace
 var apexScreenCapture = {
@@ -75,8 +75,8 @@ var apexScreenCapture = {
         return browserName;
     },
     // get Image (DataURI to Tab / base64 to Apex Ajax)
-    getImage: function(ajaxIdentifier, canvas, openWindow, callback) {
-        var img = canvas.toDataURL("image/png");
+    getImage: function(ajaxIdentifier, canvas, openWindow, mimeType, callback) {
+        var img = canvas.toDataURL(mimeType);
         if (openWindow == 'Y') {
             var browserName = apexScreenCapture.getBrowserName();
             // for IE & Edge Browser (don´t support navigating to base64 data uri)
@@ -97,7 +97,8 @@ var apexScreenCapture = {
             f01Array = apexScreenCapture.clob2Array(base64, 30000, f01Array);
             // APEX Ajax Call
             apex.server.plugin(ajaxIdentifier, {
-                f01: f01Array
+                f01: f01Array,
+                x01: mimeType
             }, {
                 dataType: 'html',
                 // SUCESS function
@@ -118,69 +119,69 @@ var apexScreenCapture = {
         }
     },
     // html2canvas function
-    dohtml2canvas: function(phtmlElem, popenWindow, pAjaxIdentifier, pbackground, pwidth, pheight, pletterRendering, pallowTaint, plogging) {
+    doHtml2Canvas: function(pHtmlElem, popenWindow, pAjaxIdentifier, pBackground, pWidth, pHeight, pLetterRendering, pAllowTaint, pMimeType, pLogging) {
         // Logging
-        if (plogging) {
-            console.log('dohtml2canvas: HTML element:', phtmlElem);
-            console.log('dohtml2canvas: element width:', pwidth);
-            console.log('dohtml2canvas: element height:', pheight);
+        if (pLogging) {
+            console.log('doHtml2Canvas: HTML element:', pHtmlElem);
+            console.log('doHtml2Canvas: element width:', pWidth);
+            console.log('doHtml2Canvas: element height:', pHeight);
         }
         // html2canvas
-        html2canvas($(phtmlElem), {
+        html2canvas($(pHtmlElem), {
             onrendered: function(canvas) {
                 // wait spinner
                 var lSpinner$ = apex.util.showSpinner($('body'));
                 // getImage
-                apexScreenCapture.getImage(pAjaxIdentifier, canvas, popenWindow, function() {
+                apexScreenCapture.getImage(pAjaxIdentifier, canvas, popenWindow, pMimeType, function() {
                     // remove spinner
                     lSpinner$.remove();
                 });
             },
-            background: pbackground,
-            width: pwidth,
-            height: pheight,
-            letterRendering: pletterRendering,
-            allowTaint: pallowTaint,
-            logging: plogging
+            background: pBackground,
+            width: pWidth,
+            height: pHeight,
+            letterRendering: pLetterRendering,
+            allowTaint: pAllowTaint,
+            logging: pLogging
         });
     },
     // html2canvas with DOM selector function
-    dohtml2canvasDom: function(pElement, popenWindow, pAjaxIdentifier, pbackground, pletterRendering, pallowTaint, plogging) {
+    doHtml2CanvasDom: function(pElement, popenWindow, pAjaxIdentifier, pBackground, pLetterRendering, pAllowTaint, pMimeType, pLogging) {
         // Parameter
         if (pElement.id) {
-            phtmlElem = '#' + pElement.id;
+            pHtmlElem = '#' + pElement.id;
         } else {
             if (pElement.className) {
-                phtmlElem = pElement.tagName.toLowerCase();
-                phtmlElem += ('.' + jQuery.trim(pElement.className).replace(/ /g, '.')).replace(/\.\.+/g, '.');
+                pHtmlElem = pElement.tagName.toLowerCase();
+                pHtmlElem += ('.' + jQuery.trim(pElement.className).replace(/ /g, '.')).replace(/\.\.+/g, '.');
             }
         }
-        pwidth = $(pElement).width();
-        pheight = $(pElement).height();
+        pWidth = $(pElement).width();
+        pHeight = $(pElement).height();
         // Logging
-        if (plogging) {
-            console.log('dohtml2canvasDom: HTML element:', phtmlElem);
-            console.log('dohtml2canvasDom: element width:', pwidth);
-            console.log('dohtml2canvasDom: element height:', pheight);
-            console.log('dohtml2canvasDom: Clicked element:', pElement);
+        if (pLogging) {
+            console.log('doHtml2CanvasDom: HTML element:', pHtmlElem);
+            console.log('doHtml2CanvasDom: element width:', pWidth);
+            console.log('doHtml2CanvasDom: element height:', pHeight);
+            console.log('doHtml2CanvasDom: Clicked element:', pElement);
         }
         // html2canvas
-        html2canvas($(phtmlElem), {
+        html2canvas($(pHtmlElem), {
             onrendered: function(canvas) {
                 // wait spinner
                 var lSpinner$ = apex.util.showSpinner($('body'));
                 // getImage
-                apexScreenCapture.getImage(pAjaxIdentifier, canvas, popenWindow, function() {
+                apexScreenCapture.getImage(pAjaxIdentifier, canvas, popenWindow, pMimeType, function() {
                     // remove spinner
                     lSpinner$.remove();
                 });
             },
-            background: pbackground,
-            width: pwidth,
-            height: pheight,
-            letterRendering: pletterRendering,
-            allowTaint: pallowTaint,
-            logging: plogging
+            background: pBackground,
+            width: pWidth,
+            height: pHeight,
+            letterRendering: pLetterRendering,
+            allowTaint: pAllowTaint,
+            logging: pLogging
         });
     },
     // function that gets called from plugin
@@ -188,71 +189,82 @@ var apexScreenCapture = {
         // plugin attributes
         var daThis = this;
         var vAjaxIdentifier = daThis.action.ajaxIdentifier;
-        var vhtmlElem = daThis.action.attribute01;
-        var vopenWindow = daThis.action.attribute02;
-        var vbackground = daThis.action.attribute04;
-        var vwidth = parseInt(daThis.action.attribute05);
-        var vheight = parseInt(daThis.action.attribute06);
-        var vletterRendering = apexScreenCapture.parseBoolean(daThis.action.attribute07);
-        var vallowTaint = apexScreenCapture.parseBoolean(daThis.action.attribute08);
-        var vlogging = apexScreenCapture.parseBoolean(daThis.action.attribute09);
-        var vdomSelector = daThis.action.attribute10;
-        var vdomFilter = daThis.action.attribute11;
-        var vdomhideLabel = apexScreenCapture.parseBoolean(daThis.action.attribute12);
-        var vdomfillContent = apexScreenCapture.parseBoolean(daThis.action.attribute13);
-        var vdomborderColor = daThis.action.attribute14;
+        var vHtmlElem = daThis.action.attribute01;
+        var vOpenWindow = daThis.action.attribute02;
+        var vBackground = daThis.action.attribute04;
+        var vWidth = parseInt(daThis.action.attribute05);
+        var vHeight = parseInt(daThis.action.attribute06);
+        var vLetterRendering = apexScreenCapture.parseBoolean(daThis.action.attribute07);
+        var vAllowTaint = apexScreenCapture.parseBoolean(daThis.action.attribute08);
+        var vLogging = apexScreenCapture.parseBoolean(daThis.action.attribute09);
+        var vDomSelector = daThis.action.attribute10;
+        var vDomFilter = daThis.action.attribute11;
+        var vDomHideLabel = apexScreenCapture.parseBoolean(daThis.action.attribute12);
+        var vDomFillContent = apexScreenCapture.parseBoolean(daThis.action.attribute13);
+        var vDomBorderColor = daThis.action.attribute14;
+        var vImageType = daThis.action.attribute15;
+        var vImageMimeType;
         // device width/height
         var clientWidth = parseInt(document.documentElement.clientWidth);
         var clientHeight = parseInt(document.documentElement.clientHeight);
-        if (vwidth === null || vwidth === undefined || isNaN(parseFloat(vwidth))) {
-            vwidth = clientWidth;
+        if (vWidth === null || vWidth === undefined || isNaN(parseFloat(vWidth))) {
+            vWidth = clientWidth;
         }
-        if (vheight === null || vheight === undefined || isNaN(parseFloat(vheight))) {
-            vheight = clientHeight;
+        if (vHeight === null || vHeight === undefined || isNaN(parseFloat(vHeight))) {
+            vHeight = clientHeight;
         }
         // defaults for DOM Outliner
-        if (vdomFilter === null || vdomFilter === undefined) {
-            vdomFilter = false;
+        if (vDomFilter === null || vDomFilter === undefined) {
+            vDomFilter = false;
         }
-        if (vdomhideLabel === null || vdomhideLabel === undefined) {
-            vdomhideLabel = false;
+        if (vDomHideLabel === null || vDomHideLabel === undefined) {
+            vDomHideLabel = false;
         }
-        if (vdomfillContent === null || vdomfillContent === undefined) {
-            vdomfillContent = false;
+        if (vDomFillContent === null || vDomFillContent === undefined) {
+            vDomFillContent = false;
+        }
+        // Image mimeType
+        if (vImageType == 'PNG') {
+            vImageMimeType = 'image/png';
+        } else if (vImageType == 'JPEG') {
+            vImageMimeType = 'image/jpeg';
+        } else {
+            vImageMimeType = 'image/png';
         }
         // Logging
-        if (vlogging) {
-            console.log('captureScreen: Attribute JQuery selector:', vhtmlElem);
-            console.log('captureScreen: Attribute open window:', vopenWindow);
-            console.log('captureScreen: Attribute background:', vbackground);
-            console.log('captureScreen: Attribute element width:', vwidth);
-            console.log('captureScreen: Attribute element height:', vheight);
-            console.log('captureScreen: Attribute letter rendering:', vletterRendering);
-            console.log('captureScreen: Attribute allow taint:', vallowTaint);
-            console.log('captureScreen: Attribute Logging:', vlogging);
-            console.log('captureScreen: Attribute DOM selector:', vdomSelector);
-            console.log('captureScreen: Attribute DOM filter:', vdomFilter);
-            console.log('captureScreen: Attribute hide label:', vdomhideLabel);
-            console.log('captureScreen: Attribute fill content:', vdomfillContent);
-            console.log('captureScreen: Attribute border color:', vdomborderColor);
+        if (vLogging) {
+            console.log('captureScreen: Attribute JQuery selector:', vHtmlElem);
+            console.log('captureScreen: Attribute open window:', vOpenWindow);
+            console.log('captureScreen: Attribute background:', vBackground);
+            console.log('captureScreen: Attribute element width:', vWidth);
+            console.log('captureScreen: Attribute element height:', vHeight);
+            console.log('captureScreen: Attribute letter rendering:', vLetterRendering);
+            console.log('captureScreen: Attribute allow taint:', vAllowTaint);
+            console.log('captureScreen: Attribute Logging:', vLogging);
+            console.log('captureScreen: Attribute DOM selector:', vDomSelector);
+            console.log('captureScreen: Attribute DOM filter:', vDomFilter);
+            console.log('captureScreen: Attribute hide label:', vDomHideLabel);
+            console.log('captureScreen: Attribute fill content:', vDomFillContent);
+            console.log('captureScreen: Attribute border color:', vDomBorderColor);
+            console.log('captureScreen: Attribute image mime-type:', vImageMimeType);
         }
-        if (vdomSelector == 'Y') {
+        if (vDomSelector == 'Y') {
             // html2canvas with DOM Outliner
             var myClickHandler = function(element) {
-                apexScreenCapture.dohtml2canvasDom(element, vopenWindow, vAjaxIdentifier, vbackground, vletterRendering, vallowTaint, vlogging);
+                apexScreenCapture.doHtml2CanvasDom(element, vOpenWindow, vAjaxIdentifier, vBackground, vLetterRendering, vAllowTaint, vImageMimeType, vLogging);
             };
             var myDomOutline = DomOutline({
                 onClick: myClickHandler,
-                filter: vdomFilter,
+                filter: vDomFilter,
                 stopOnClick: true,
-                borderColor: vdomborderColor,
-                hideLabel: vdomhideLabel,
-                fillContent: vdomfillContent
+                borderColor: vDomBorderColor,
+                hideLabel: vDomHideLabel,
+                fillContent: vDomFillContent
             });
             myDomOutline.start();
         } else {
             // html2canvas
-            apexScreenCapture.dohtml2canvas(vhtmlElem, vopenWindow, vAjaxIdentifier, vbackground, vwidth, vheight, vletterRendering, vallowTaint, vlogging);
+            apexScreenCapture.doHtml2Canvas(vHtmlElem, vOpenWindow, vAjaxIdentifier, vBackground, vWidth, vHeight, vLetterRendering, vAllowTaint, vImageMimeType, vLogging);
         }
     }
 };
