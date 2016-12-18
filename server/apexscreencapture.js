@@ -1,6 +1,6 @@
 // APEX Screen capture functions
 // Author: Daniel Hochleitner
-// Version: 1.9.1
+// Version: 1.9.2
 
 // global namespace
 var apexScreenCapture = {
@@ -119,7 +119,7 @@ var apexScreenCapture = {
         }
     },
     // html2canvas function
-    doHtml2Canvas: function(pHtmlElem, popenWindow, pAjaxIdentifier, pBackground, pWidth, pHeight, pLetterRendering, pAllowTaint, pMimeType, pLogging) {
+    doHtml2Canvas: function(pHtmlElem, pOpenWindow, pAjaxIdentifier, pBackground, pWidth, pHeight, pLetterRendering, pAllowTaint, pMimeType, pLogging) {
         // Logging
         if (pLogging) {
             console.log('doHtml2Canvas: HTML element:', pHtmlElem);
@@ -132,7 +132,7 @@ var apexScreenCapture = {
                 // wait spinner
                 var lSpinner$ = apex.util.showSpinner($('body'));
                 // getImage
-                apexScreenCapture.getImage(pAjaxIdentifier, canvas, popenWindow, pMimeType, function() {
+                apexScreenCapture.getImage(pAjaxIdentifier, canvas, pOpenWindow, pMimeType, function() {
                     // remove spinner
                     lSpinner$.remove();
                 });
@@ -146,32 +146,23 @@ var apexScreenCapture = {
         });
     },
     // html2canvas with DOM selector function
-    doHtml2CanvasDom: function(pElement, popenWindow, pAjaxIdentifier, pBackground, pLetterRendering, pAllowTaint, pMimeType, pLogging) {
+    doHtml2CanvasDom: function(pElement, pOpenWindow, pAjaxIdentifier, pBackground, pLetterRendering, pAllowTaint, pMimeType, pLogging) {
         // Parameter
-        if (pElement.id) {
-            pHtmlElem = '#' + pElement.id;
-        } else {
-            if (pElement.className) {
-                pHtmlElem = pElement.tagName.toLowerCase();
-                pHtmlElem += ('.' + jQuery.trim(pElement.className).replace(/ /g, '.')).replace(/\.\.+/g, '.');
-            }
-        }
         pWidth = $(pElement).width();
         pHeight = $(pElement).height();
         // Logging
         if (pLogging) {
-            console.log('doHtml2CanvasDom: HTML element:', pHtmlElem);
+            console.log('doHtml2CanvasDom: Clicked element:', pElement);
             console.log('doHtml2CanvasDom: element width:', pWidth);
             console.log('doHtml2CanvasDom: element height:', pHeight);
-            console.log('doHtml2CanvasDom: Clicked element:', pElement);
         }
         // html2canvas
-        html2canvas($(pHtmlElem), {
+        html2canvas($(pElement), {
             onrendered: function(canvas) {
                 // wait spinner
                 var lSpinner$ = apex.util.showSpinner($('body'));
                 // getImage
-                apexScreenCapture.getImage(pAjaxIdentifier, canvas, popenWindow, pMimeType, function() {
+                apexScreenCapture.getImage(pAjaxIdentifier, canvas, pOpenWindow, pMimeType, function() {
                     // remove spinner
                     lSpinner$.remove();
                 });
