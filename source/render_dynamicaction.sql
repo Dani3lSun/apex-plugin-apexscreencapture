@@ -1,6 +1,6 @@
 /*-------------------------------------
  * APEX Screen Capture functions
- * Version: 1.9.2 (18.12.2016)
+ * Version: 1.9.3 (11.04.2017)
  * Author:  Daniel Hochleitner
  *-------------------------------------
 */
@@ -30,6 +30,7 @@ FUNCTION render_screencapture(p_dynamic_action IN apex_plugin.t_dynamic_action,
   l_html2canvas_js       VARCHAR2(50);
   l_promise_js           VARCHAR2(50);
   l_domoutline_js        VARCHAR2(50);
+  l_canvg_js             VARCHAR2(50);
   --
 BEGIN
   -- Debug
@@ -41,12 +42,14 @@ BEGIN
     l_html2canvas_js       := 'html2canvas';
     l_promise_js           := 'es6-promise';
     l_domoutline_js        := 'jquery.dom-outline-1.0';
+    l_canvg_js             := 'canvg-all';
   ELSE
     -- minified
     l_apexscreencapture_js := 'apexscreencapture.min';
     l_html2canvas_js       := 'html2canvas.min';
     l_promise_js           := 'es6-promise.min';
     l_domoutline_js        := 'jquery.dom-outline-1.0.min';
+    l_canvg_js             := 'canvg-all.min';
   END IF;
   --
   -- add html2canvas js / screencapture js / jquery dom outline js (and promise for older browsers)
@@ -57,6 +60,11 @@ BEGIN
 
   --
   apex_javascript.add_library(p_name           => l_html2canvas_js,
+                              p_directory      => p_plugin.file_prefix,
+                              p_version        => NULL,
+                              p_skip_extension => FALSE);
+  --
+  apex_javascript.add_library(p_name           => l_canvg_js,
                               p_directory      => p_plugin.file_prefix,
                               p_version        => NULL,
                               p_skip_extension => FALSE);

@@ -5,6 +5,8 @@ The screenshot is based on the DOM and as such may not be 100% accurate to the r
 **Works best in modern browsers** [For more informations visit html2canvas](https://github.com/niklasvh/html2canvas)
 
 ## Changelog
+#### 1.9.3 - added support for capturing SVG
+
 #### 1.9.2 - fixed a bug there the DOM Selector picked the wrong region
 
 #### 1.9.1 - added option to choose the mime type (PNG or JPEG) of the image which gets saved to DB

@@ -1,6 +1,6 @@
 // APEX Screen capture functions
 // Author: Daniel Hochleitner
-// Version: 1.9.2
+// Version: 1.9.3
 
 // global namespace
 var apexScreenCapture = {
@@ -74,6 +74,35 @@ var apexScreenCapture = {
         }
         return browserName;
     },
+    // Convert SVG to temp. Canvas
+    svg2canvas: function(containerSelector, callback) {
+        try {
+            var canvas, xml;
+            var svgElements = $(containerSelector).find('svg');
+            //replace all svgs with a temp canvas
+            svgElements.each(function() {
+                canvas = document.createElement("canvas");
+                canvas.className = "tempCanvas";
+                // Set proper width / height of SVG
+                $(this).attr('width', $(this).innerWidth());
+                $(this).attr('height', $(this).innerHeight());
+                //convert SVG into a XML string
+                xml = (new XMLSerializer()).serializeToString(this);
+                // Removing the name space as IE throws an error
+                xml = xml.replace(/xmlns=\"http:\/\/www\.w3\.org\/2000\/svg\"/, '');
+
+                //draw the SVG onto a canvas
+                canvg(canvas, xml);
+                $(canvas).insertAfter(this);
+                //hide the SVG element
+                $(this).attr('class', 'tempHide');
+                $(this).hide();
+            });
+            callback();
+        } catch (err) {
+            callback();
+        }
+    },
     // get Image (DataURI to Tab / base64 to Apex Ajax)
     getImage: function(ajaxIdentifier, canvas, openWindow, mimeType, callback) {
         var img = canvas.toDataURL(mimeType);
@@ -126,23 +155,29 @@ var apexScreenCapture = {
             console.log('doHtml2Canvas: element width:', pWidth);
             console.log('doHtml2Canvas: element height:', pHeight);
         }
-        // html2canvas
-        html2canvas($(pHtmlElem), {
-            onrendered: function(canvas) {
-                // wait spinner
-                var lSpinner$ = apex.util.showSpinner($('body'));
-                // getImage
-                apexScreenCapture.getImage(pAjaxIdentifier, canvas, pOpenWindow, pMimeType, function() {
-                    // remove spinner
-                    lSpinner$.remove();
-                });
-            },
-            background: pBackground,
-            width: pWidth,
-            height: pHeight,
-            letterRendering: pLetterRendering,
-            allowTaint: pAllowTaint,
-            logging: pLogging
+        // wait spinner
+        var lSpinner$ = apex.util.showSpinner($('body'));
+        lSpinner$.attr('data-html2canvas-ignore', 'true');
+        // html2canvas with svg2canvas
+        apexScreenCapture.svg2canvas('body', function() {
+            html2canvas($(pHtmlElem), {
+                onrendered: function(canvas) {
+                    // getImage
+                    apexScreenCapture.getImage(pAjaxIdentifier, canvas, pOpenWindow, pMimeType, function() {
+                        // remove spinner
+                        lSpinner$.remove();
+                    });
+                },
+                background: pBackground,
+                width: pWidth,
+                height: pHeight,
+                letterRendering: pLetterRendering,
+                allowTaint: pAllowTaint,
+                logging: pLogging
+            });
+            // remove tmp svg2canvas
+            $('body').find('.tempCanvas').remove();
+            $('body').find('.tempHide').show().removeClass('tempHide');
         });
     },
     // html2canvas with DOM selector function
@@ -156,23 +191,29 @@ var apexScreenCapture = {
             console.log('doHtml2CanvasDom: element width:', pWidth);
             console.log('doHtml2CanvasDom: element height:', pHeight);
         }
-        // html2canvas
-        html2canvas($(pElement), {
-            onrendered: function(canvas) {
-                // wait spinner
-                var lSpinner$ = apex.util.showSpinner($('body'));
-                // getImage
-                apexScreenCapture.getImage(pAjaxIdentifier, canvas, pOpenWindow, pMimeType, function() {
-                    // remove spinner
-                    lSpinner$.remove();
-                });
-            },
-            background: pBackground,
-            width: pWidth,
-            height: pHeight,
-            letterRendering: pLetterRendering,
-            allowTaint: pAllowTaint,
-            logging: pLogging
+        // wait spinner
+        var lSpinner$ = apex.util.showSpinner($('body'));
+        lSpinner$.attr('data-html2canvas-ignore', 'true');
+        // html2canvas with svg2canvas
+        apexScreenCapture.svg2canvas('body', function() {
+            html2canvas($(pElement), {
+                onrendered: function(canvas) {
+                    // getImage
+                    apexScreenCapture.getImage(pAjaxIdentifier, canvas, pOpenWindow, pMimeType, function() {
+                        // remove spinner
+                        lSpinner$.remove();
+                    });
+                },
+                background: pBackground,
+                width: pWidth,
+                height: pHeight,
+                letterRendering: pLetterRendering,
+                allowTaint: pAllowTaint,
+                logging: pLogging
+            });
+            // remove tmp svg2canvas
+            $('body').find('.tempCanvas').remove();
+            $('body').find('.tempHide').show().removeClass('tempHide');
         });
     },
     // function that gets called from plugin
