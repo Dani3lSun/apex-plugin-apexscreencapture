@@ -1,6 +1,6 @@
 /*-------------------------------------
  * APEX Screen Capture functions
- * Version: 1.9.3 (11.04.2017)
+ * Version: 1.9.4 (18.05.2017)
  * Author:  Daniel Hochleitner
  *-------------------------------------
 */

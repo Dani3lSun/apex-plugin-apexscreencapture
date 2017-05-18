@@ -5,6 +5,8 @@ The screenshot is based on the DOM and as such may not be 100% accurate to the r
 **Works best in modern browsers** [For more informations visit html2canvas](https://github.com/niklasvh/html2canvas)
 
 ## Changelog
+#### 1.9.4 - get proper width/height of elements if JQuery Selector != body
+
 #### 1.9.3 - added support for capturing SVG
 
 #### 1.9.2 - fixed a bug there the DOM Selector picked the wrong region
