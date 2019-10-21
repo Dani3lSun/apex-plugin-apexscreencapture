@@ -1,6 +1,6 @@
 // APEX Screen capture functions
 // Author: Daniel Hochleitner
-// Version: 1.9.4
+// Version: 1.9.5
 
 // global namespace
 var apexScreenCapture = {
@@ -31,48 +31,6 @@ var apexScreenCapture = {
     var base64 = dataURI.substr(dataURI.indexOf(',') + 1);
     return base64;
   },
-  // Get Browser Name helper function
-  getBrowserName: function() {
-    var nAgt = navigator.userAgent;
-    var browserName = navigator.appName;
-    var nameOffset, verOffset;
-
-    // In Opera, the true version is after "Opera" or after "Version"
-    if ((verOffset = nAgt.indexOf("Opera")) != -1) {
-      browserName = "opera";
-    }
-    // In MSIE, the true version is after "MSIE" in userAgent
-    else if ((verOffset = nAgt.indexOf("MSIE")) != -1) {
-      browserName = "ie";
-    } else if ((verOffset = nAgt.indexOf("Trident")) != -1) {
-      browserName = "ie";
-    }
-    // In Edge, the true version is after "Edge"
-    else if ((verOffset = nAgt.indexOf("Edge")) != -1) {
-      browserName = "edge";
-    }
-    // In Chrome, the true version is after "Chrome"
-    else if ((verOffset = nAgt.indexOf("Chrome")) != -1) {
-      browserName = "chrome";
-    }
-    // In Safari, the true version is after "Safari" or after "Version"
-    else if ((verOffset = nAgt.indexOf("Safari")) != -1) {
-      browserName = "safari";
-    }
-    // In Firefox, the true version is after "Firefox"
-    else if ((verOffset = nAgt.indexOf("Firefox")) != -1) {
-      browserName = "firefox";
-    }
-    // In most other browsers, "name/version" is at the end of userAgent
-    else if ((nameOffset = nAgt.lastIndexOf(' ') + 1) <
-      (verOffset = nAgt.lastIndexOf('/'))) {
-      browserName = nAgt.substring(nameOffset, verOffset);
-      if (browserName.toLowerCase() == browserName.toUpperCase()) {
-        browserName = navigator.appName;
-      }
-    }
-    return browserName;
-  },
   // Convert SVG to temp. Canvas
   svg2canvas: function(containerSelector, callback) {
     try {
@@ -102,21 +60,55 @@ var apexScreenCapture = {
       callback();
     }
   },
+  // Convert image to PDF
+  // Image Ratio: https://stackoverflow.com/questions/36472094/how-to-set-image-to-fit-width-of-the-page-using-jspdf/54336658#54336658
+  convertImage2PDF: function(pCanvas) {
+    var pdf = new jsPDF('l', 'mm', 'a4');
+    var imgData = pCanvas.toDataURL('image/jpeg');
+    var imgWidth = pCanvas.width;
+    var imgHeight = pCanvas.height;
+    var imgRatio = imgWidth / imgHeight;
+    var pageWidth = pdf.internal.pageSize.getWidth();
+    var pageHeight = pdf.internal.pageSize.getHeight();
+    var pageRatio = pageWidth / pageHeight;
+    var wc;
+
+    if (imgRatio >= 1) {
+      wc = imgWidth / pageWidth;
+      if (imgRatio >= pageRatio) {
+        pdf.addImage(imgData, 'JPEG', 0, (pageHeight - imgHeight / wc) / 2, pageWidth, imgHeight / wc, null, 'NONE');
+      } else {
+        var pi = pageRatio / imgRatio;
+        pdf.addImage(imgData, 'JPEG', (pageWidth - pageWidth / pi) / 2, 0, pageWidth / pi, (imgHeight / pi) / wc, null, 'NONE');
+      }
+    } else {
+      wc = imgWidth / pageHeight;
+      if (1 / imgRatio > pageRatio) {
+        var ip = (1 / imgRatio) / pageRatio;
+        var margin = (pageHeight - ((imgHeight / ip) / wc)) / 4;
+        pdf.addImage(imgData, 'JPEG', (pageWidth - (imgHeight / ip) / wc) / 2, -(((imgHeight / ip) / wc) + margin), pageHeight / ip, (imgHeight / ip) / wc, null, 'NONE', -90);
+      } else {
+        pdf.addImage(imgData, 'JPEG', (pageWidth - imgHeight / wc) / 2, -(imgHeight / wc), pageHeight, imgHeight / wc, null, 'NONE', -90);
+      }
+    }
+    return pdf;
+  },
   // get Image (DataURI to Tab / base64 to Apex Ajax)
   getImage: function(ajaxIdentifier, canvas, openWindow, mimeType, callback) {
-    var img = canvas.toDataURL(mimeType);
-    if (openWindow == 'Y') {
-      var browserName = apexScreenCapture.getBrowserName();
-      // for IE & Edge Browser (don´t support navigating to base64 data uri)
-      if (browserName == 'ie' || browserName == 'edge') {
-        window.navigator.msSaveBlob(canvas.msToBlob(), 'screenshot.png');
-        callback();
+    var img;
+    if (mimeType === 'application/pdf') {
+      var pdf = apexScreenCapture.convertImage2PDF(canvas);
+      img = pdf.output('datauristring');
+    } else {
+      img = canvas.toDataURL(mimeType);
+    }
+    if (openWindow === 'Y') {
+      if (mimeType === 'application/pdf') {
+        window.open(pdf.output('bloburl'), '_blank');
+      } else {
+        window.open().document.write('<img src="' + img + '" />');
       }
-      // all other browsers
-      else {
-        apex.navigation.openInNewWindow(img, 'CapturedImageWindow');
-        callback();
-      }
+      callback();
     } else {
       // img DataURI to base64
       var base64 = apexScreenCapture.dataURI2base64(img);
@@ -267,6 +259,8 @@ var apexScreenCapture = {
       vImageMimeType = 'image/png';
     } else if (vImageType == 'JPEG') {
       vImageMimeType = 'image/jpeg';
+    } else if (vImageType == 'PDF') {
+      vImageMimeType = 'application/pdf';
     } else {
       vImageMimeType = 'image/png';
     }

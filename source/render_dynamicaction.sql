@@ -1,6 +1,6 @@
 /*-------------------------------------
  * APEX Screen Capture functions
- * Version: 1.9.4 (18.05.2017)
+ * Version: 1.9.5 (21.10.2019)
  * Author:  Daniel Hochleitner
  *-------------------------------------
 */
@@ -31,6 +31,7 @@ FUNCTION render_screencapture(p_dynamic_action IN apex_plugin.t_dynamic_action,
   l_promise_js           VARCHAR2(50);
   l_domoutline_js        VARCHAR2(50);
   l_canvg_js             VARCHAR2(50);
+  l_jspdf_js             VARCHAR2(50);
   --
 BEGIN
   -- Debug
@@ -43,6 +44,7 @@ BEGIN
     l_promise_js           := 'es6-promise';
     l_domoutline_js        := 'jquery.dom-outline-1.0';
     l_canvg_js             := 'canvg-all';
+    l_jspdf_js             := 'jspdf';
   ELSE
     -- minified
     l_apexscreencapture_js := 'apexscreencapture.min';
@@ -50,7 +52,27 @@ BEGIN
     l_promise_js           := 'es6-promise.min';
     l_domoutline_js        := 'jquery.dom-outline-1.0.min';
     l_canvg_js             := 'canvg-all.min';
+    l_jspdf_js             := 'jspdf.min';
   END IF;
+  -- attribute defaults
+  l_open_window      := nvl(l_open_window,
+                            'Y');
+  l_dom_selector     := nvl(l_dom_selector,
+                            'N');
+  l_letter_rendering := nvl(l_letter_rendering,
+                            'false');
+  l_allow_taint      := nvl(l_allow_taint,
+                            'false');
+  l_dom_hidelabel    := nvl(l_dom_hidelabel,
+                            'false');
+  l_dom_fillcontent  := nvl(l_dom_fillcontent,
+                            'false');
+  l_border_color     := nvl(l_border_color,
+                            '#09c');
+  l_image_mime_type  := nvl(l_image_mime_type,
+                            'PNG');
+  l_logging          := nvl(l_logging,
+                            'false');
   --
   -- add html2canvas js / screencapture js / jquery dom outline js (and promise for older browsers)
   apex_javascript.add_library(p_name           => l_promise_js,
@@ -75,31 +97,19 @@ BEGIN
                                 p_version        => NULL,
                                 p_skip_extension => FALSE);
   END IF;
+  -- add jsPDF lib for PDF outputs
+  IF l_image_mime_type = 'PDF' THEN
+    apex_javascript.add_library(p_name           => l_jspdf_js,
+                                p_directory      => p_plugin.file_prefix,
+                                p_version        => NULL,
+                                p_skip_extension => FALSE);
+  END IF;
   --
   apex_javascript.add_library(p_name           => l_apexscreencapture_js,
                               p_directory      => p_plugin.file_prefix,
                               p_version        => NULL,
                               p_skip_extension => FALSE);
-  -- attribute defaults
-  l_open_window      := nvl(l_open_window,
-                            'Y');
-  l_dom_selector     := nvl(l_dom_selector,
-                            'N');
-  l_letter_rendering := nvl(l_letter_rendering,
-                            'false');
-  l_allow_taint      := nvl(l_allow_taint,
-                            'false');
-  l_dom_hidelabel    := nvl(l_dom_hidelabel,
-                            'false');
-  l_dom_fillcontent  := nvl(l_dom_fillcontent,
-                            'false');
-  l_border_color     := nvl(l_border_color,
-                            '#09c');
-  l_image_mime_type  := nvl(l_image_mime_type,
-                            'PNG');
-  l_logging          := nvl(l_logging,
-                            'false');
-  --
+
   --
   l_result.javascript_function := 'apexScreenCapture.captureScreen';
   l_result.ajax_identifier     := apex_plugin.get_ajax_identifier;
@@ -128,8 +138,7 @@ END render_screencapture;
 --
 --
 FUNCTION ajax_screencapture(p_dynamic_action IN apex_plugin.t_dynamic_action,
-                            p_plugin         IN apex_plugin.t_plugin)
-  RETURN apex_plugin.t_dynamic_action_ajax_result IS
+                            p_plugin         IN apex_plugin.t_plugin) RETURN apex_plugin.t_dynamic_action_ajax_result IS
   --
   -- plugin attributes
   l_result apex_plugin.t_dynamic_action_ajax_result;

@@ -8,7 +8,11 @@ The screenshot is based on the DOM and as such may not be 100% accurate to the r
 
 **Works best in modern browsers** [For more informations visit html2canvas](https://github.com/niklasvh/html2canvas)
 
+
 ## Changelog
+
+#### 1.9.5 - Added option to export screenshot as a PDF file
+
 #### 1.9.4 - get proper width/height of elements if JQuery Selector != body
 
 #### 1.9.3 - added support for capturing SVG
@@ -37,11 +41,15 @@ The screenshot is based on the DOM and as such may not be 100% accurate to the r
 
 #### 1.0 - Initial Release
 
+
 ## Install
+
 - Import plugin file "dynamic_action_plugin_de_danielh_apexscreencapture.sql" from source directory into your application
 - (Optional) Deploy the JS files from "server" directory on your webserver and change the "File Prefix" to webservers folder.
 
+
 ## Plugin Settings
+
 The plugin settings are highly customizable and you can change:
 - **DOM UI Selector** - Choose if a graphical selector should be used or not.
 - **DOM Filter** - A selector that an element should match in order to be outlined and clicked. Default is 'div'. No value means no filter is enabled and all elements would be outlined.
@@ -54,7 +62,7 @@ The plugin settings are highly customizable and you can change:
 - **Background color** - Canvas background color, if none is specified in DOM. Set undefined for transparent
 - **Width** - Width in pixels (default screen width)
 - **Height** - Height in pixels (default screen height)
-- **Image Mime-Type** - Mime-Type of the resulting screenshot image
+- **Output-Type** - Output-Type of the resulting screenshot image (e.g. PNG, JPEG, PDF)
 - **Letter rendering** - Whether to render each letter separately
 - **Allow taint** - Whether to allow cross-origin images to taint the canvas
 - **Logging** - Whether to log events in the console
@@ -75,7 +83,6 @@ For saving the screenshot (base64 png) to DB you can use a PL/SQL function like 
 DECLARE
   --
   l_collection_name VARCHAR2(100);
-  l_clob            CLOB;
   l_blob            BLOB;
   l_filename        VARCHAR2(100);
   l_mime_type       VARCHAR2(100);
@@ -83,34 +90,35 @@ DECLARE
   --
 BEGIN
   -- get defaults
-  l_filename  := 'screenshot_' ||
-                 to_char(SYSDATE,
-                         'YYYYMMDDHH24MISS') || '.png';
-  l_mime_type := 'image/png';
+  l_mime_type := nvl(apex_application.g_x01,
+                     'image/png');
+  l_filename  := 'screenshot_' || to_char(SYSDATE,
+                                          'YYYYMMDDHH24MISS');
+  -- file name based on mime type
+  IF l_mime_type = 'image/png' THEN
+    l_filename := l_filename || '.png';
+  ELSIF l_mime_type = 'image/jpeg' THEN
+    l_filename := l_filename || '.jpg';
+  ELSIF l_mime_type = 'application/pdf' THEN
+    l_filename := l_filename || '.pdf';
+  END IF;
   -- build CLOB from f01 30k Array
-  dbms_lob.createtemporary(l_clob,
+  dbms_lob.createtemporary(l_blob,
                            FALSE,
                            dbms_lob.session);
-
   FOR i IN 1 .. apex_application.g_f01.count LOOP
     l_token := wwv_flow.g_f01(i);
-
     IF length(l_token) > 0 THEN
-      dbms_lob.writeappend(l_clob,
-                           length(l_token),
-                           l_token);
+      dbms_lob.append(l_blob,
+                      to_blob(utl_encode.base64_decode(utl_raw.cast_to_raw(l_token))));
     END IF;
   END LOOP;
-  --
-  -- convert base64 CLOB to BLOB (mimetype: image/png)
-  l_blob := apex_web_service.clobbase642blob(p_clob => l_clob);
   --
   -- create own collection (here starts custom part (for example a Insert statement))
   -- collection name
   l_collection_name := 'SCREEN_CAPTURE';
   -- check if exist
-  IF NOT
-      apex_collection.collection_exists(p_collection_name => l_collection_name) THEN
+  IF NOT apex_collection.collection_exists(p_collection_name => l_collection_name) THEN
     apex_collection.create_collection(l_collection_name);
   END IF;
   -- add collection member (only if BLOB not null)
@@ -138,6 +146,7 @@ If you would like to exclude a complete region add the "data-html2canvas-ignore"
 
 ## Demo Application
 https://apex.oracle.com/pls/apex/f?p=APEXPLUGIN
+
 
 ## Preview
 ![](https://github.com/Dani3lSun/apex-plugin-apexscreencapture/blob/master/preview.gif)
