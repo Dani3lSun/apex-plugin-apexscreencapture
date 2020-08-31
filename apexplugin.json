@@ -9,6 +9,8 @@
     "email" : "daniel@danielh.de"
   },
   "license" : "MIT",
+  "commercial" : "No",
+  "commercially_supported": "Yes",
   "author" : {
     "name" : "Daniel Hochleitner",
     "email" : "daniel@danielh.de",
